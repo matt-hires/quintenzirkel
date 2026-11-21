@@ -10,3 +10,7 @@ Interaktiver Quintenzirkel mit deutschen Bezeichnungen (H, B, Fis, Es …).
 Eine einzelne statische `index.html`, kein Build nötig.
 
 Live: https://matt-hires.github.io/quintenzirkel/
+
+## Lizenz
+
+MIT – siehe [LICENSE](LICENSE).
