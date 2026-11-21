@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quintenzirkel & Stufen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: ruhig, präzise, wie ein gutes Lehrbuch-Werkzeug.
+   IDEA: eine gedruckte Drehscheibe (Volvelle) aus dem Musikunterricht.
+   PICTURE: das Rad selbst, groß, drehbar; Ringe = Tonart, Töne, Dreiklänge, Septakkorde, Modi.
+   COLOUR and TYPE: Pflaume, Himbeere, Koralle, Senf auf hellem Papier / Nacht; Manrope.
+   LAYOUT: Titel, Systemwahl, Rad links, Stufen-Details rechts; unter 900px gestapelt. */
+:root{color-scheme:light dark;
+--bg:light-dark(#fbfaf7,#131118);--ink:light-dark(#1d1b22,#ece9f1);--muted:light-dark(#6a6573,#a39fae);
+--ring:light-dark(#2b2738,#2f2b3d);--panel:light-dark(#f2efe8,#1d1a24);--line:light-dark(#e0dbd0,#2c2836);
+--n:#f6cf6a;--t:#ef8a5c;--s:#c2456a;--m:#5a2b6e;--hl:light-dark(#1d1b22,#fff)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Manrope,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(20px,4vw,48px) max(5vw,16px);max-width:1240px;margin:0 auto}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0 0 6px;font-weight:800;text-wrap:balance}
+.lead{color:var(--muted);margin:0 0 18px;max-width:62ch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tabs button{font:600 15px Manrope,sans-serif;min-height:44px;padding:0 16px;border-radius:22px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ring);color:#fff;border-color:var(--ring)}
+button:focus-visible{outline:3px solid var(--t);outline-offset:2px}
+.hint{font-size:13px;color:var(--muted);margin:0 0 8px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;align-items:start}
+@media(min-width:900px){.grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}}
+.wheel{width:100%;max-width:680px;aspect-ratio:1;margin:0 auto;display:block;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none;cursor:grab}
+.wheel text{pointer-events:none;font-family:Manrope,sans-serif}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.panel{background:var(--panel);border-radius:16px;padding:20px}
+.panel h2{font-size:24px;line-height:1.15;margin:0 0 4px}
+.key{color:var(--muted);font-size:15px;margin:0 0 16px}
+dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 14px}
+dt{color:var(--muted);font-size:14px}dd{margin:0;font-weight:600}
+dd small{font-weight:400;color:var(--muted);font-size:14px;display:block}
+.play{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.play button{font:600 14px Manrope,sans-serif;min-height:44px;padding:0 14px;border-radius:10px;border:0;background:var(--ring);color:#fff;cursor:pointer}
+table{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px}
+th{text-align:left;color:var(--muted);font-weight:600;padding:6px 6px;border-bottom:1px solid var(--line)}
+td{padding:8px 6px;border-bottom:1px solid var(--line)}
+tbody tr{cursor:pointer}tbody tr.on{background:color-mix(in srgb,var(--t) 22%,transparent)}
+@media(max-width:600px){table{font-size:13px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="band">
+<h1>Quintenzirkel & Stufen</h1>
+<p class="lead">Außen die Tonarten im Quintenzirkel, innen die Stufen der gewählten Tonart: Töne, Dreiklänge, Septakkorde und Modi.</p>
+<div class="tabs" role="group" aria-label="Tonleitersystem">
+<button data-sys="dur" aria-pressed="true">Dur</button>
+<button data-sys="hmoll" aria-pressed="false">Harm. Moll</button>
+<button data-sys="mmoll" aria-pressed="false">Mel. Moll</button>
+<button data-sys="hdur" aria-pressed="false">Harm. Dur</button>
+</div>
+<p class="hint">Außenring wischen zum Drehen, Tonart antippen zum Wählen (nochmals tippen = enharmonisch umdeuten, z. B. Fis ↔ Ges). Stufe antippen für Details, Mitte antippen spielt die Tonleiter.</p>
+<div class="grid">
+<div>
+<svg class="wheel" id="wheel" viewBox="0 0 1000 1000" role="img" aria-label="Quintenzirkel mit Stufenringen"></svg>
+<div class="legend"><span><i style="background:var(--ring)"></i>Tonart</span><span><i style="background:var(--n)"></i>Töne</span><span><i style="background:var(--t)"></i>Dreiklänge</span><span><i style="background:var(--s)"></i>Septakkorde</span><span><i style="background:var(--m)"></i>Modi</span></div>
+</div>
+<section class="panel" id="info" aria-live="polite"></section>
+</div>
+</main>
+<script>
+{
+const L='CDEFGAB',LS=[0,2,4,5,7,9,11],MAJ=[0,2,4,5,7,9,11],NATMIN=[0,2,3,5,7,8,10];
+const SYS={
+dur:{iv:[0,2,4,5,7,9,11],minor:false,sub:'',modes:['Ionisch','Dorisch','Phrygisch','Lydisch','Mixolydisch','Äolisch','Lokrisch']},
+hmoll:{iv:[0,2,3,5,7,8,11],minor:true,sub:'harmonisch',modes:['Harmonisch Moll','Lokrisch ♮6','Ionisch ♯5','Dorisch ♯4','Phrygisch-Dominant','Lydisch ♯2','Alteriert ♭♭7']},
+mmoll:{iv:[0,2,3,5,7,9,11],minor:true,sub:'melodisch',modes:['Melodisch Moll','Dorisch ♭2','Lydisch ♯5','Lydisch ♭7','Mixolydisch ♭6','Lokrisch ♮2','Alteriert']},
+hdur:{iv:[0,2,4,5,7,8,11],minor:false,sub:'harmonisch',modes:['Harmonisch Dur','Dorisch ♭5','Phrygisch ♭4','Lydisch ♭3','Mixolydisch ♭2','Lydisch ♯2 ♯5','Lokrisch ♭♭7']}};
+const FIF=[0,7,2,9,4,11,6,1,8,3,10,5];
+const SP_MAJ={0:[[0,0]],7:[[4,0]],2:[[1,0]],9:[[5,0]],4:[[2,0]],11:[[6,0],[0,-1]],6:[[3,1],[4,-1]],1:[[1,-1],[0,1]],8:[[5,-1]],3:[[2,-1]],10:[[6,-1]],5:[[3,0]]};
+const SP_MIN={0:[[0,0]],7:[[4,0]],2:[[1,0]],9:[[5,0]],4:[[2,0]],11:[[6,0]],6:[[3,1]],1:[[0,1],[1,-1]],8:[[4,1],[5,-1]],3:[[2,-1],[1,1]],10:[[6,-1],[5,1]],5:[[3,0]]};
+const TQ={'4,7':['Dur',1,''],'3,7':['Moll',0,''],'3,6':['verm.',0,'°'],'4,8':['überm.',1,'+'],'4,6':['Dur♭5',1,'♭5']};
+const SQ={'4,7,11':'maj7','4,7,10':'7','3,7,10':'m7','3,6,10':'m7♭5','3,6,9':'°7','3,7,11':'m(maj7)','4,8,11':'maj7♯5','4,8,10':'7♯5','4,6,10':'7♭5','4,6,11':'maj7♭5'};
+const RN=['I','II','III','IV','V','VI','VII'];
+const mod=(n,m)=>((n%m)+m)%m;
+const S={sys:'dur',k:0,sp:0,deg:0,rot:0};
+const svg=document.getElementById('wheel'),info=document.getElementById('info');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function spell([tl,ta],iv){return iv.map((x,i)=>{const l=(tl+i)%7;let a=mod(LS[tl]+ta+x-LS[l],12);if(a>6)a-=12;return[l,a]})}
+function dn([l,a]){if(a===0)return l===6?'H':L[l];if(a>0)return(l===6?'H':L[l])+'is'.repeat(a);
+ if(l===6)return a===-1?'B':'Heses';if(l===2)return a===-1?'Es':'Eses';if(l===5)return a===-1?'As':'Asas';return L[l]+'es'.repeat(-a)}
+function spList(k){return(SYS[S.sys].minor?SP_MIN:SP_MAJ)[FIF[k]]}
+function tonicOf(k,sp){const l=spList(k);return l[Math.min(sp,l.length-1)]}
+function keyName(t,sys){const n=dn(t);return SYS[sys].minor?n.toLowerCase()+'-Moll':n+'-Dur'}
+function sig(notes){let sh=0,fl=0;notes.forEach(([,a])=>a>0?sh+=a:fl-=a);
+ if(!sh&&!fl)return'keine Vorzeichen';if(sh&&fl)return sh+' ♯ / '+fl+' ♭';return sh?sh+' ♯':fl+' ♭'}
+
+function analyse(){
+ const sy=SYS[S.sys],iv=sy.iv,t=tonicOf(S.k,S.sp),N=spell(t,iv);
+ const I=(d,k)=>mod(iv[(d+k)%7]-iv[d],12);
+ const degs=N.map((n,d)=>{
+  const root=dn(n),tq=TQ[I(d,2)+','+I(d,4)]||['?',1,''];
+  const acc=iv[d]-MAJ[d],pre=acc<0?'♭'.repeat(-acc):'♯'.repeat(acc);
+  const roman=pre+(tq[1]?RN[d]:RN[d].toLowerCase())+tq[2];
+  const triad=(tq[1]?root:root.toLowerCase())+'-'+tq[0];
+  const sq=SQ[I(d,2)+','+I(d,4)+','+I(d,6)]||'(?)';
+  const formula=[0,1,2,3,4,5,6].map(i=>{let df=I(d,i)-MAJ[i];if(df>6)df-=12;if(df<-6)df+=12;return(df<0?'♭'.repeat(-df):'♯'.repeat(df))+(i+1)}).join(' ');
+  const pick=ks=>ks.map(k=>dn(N[(d+k)%7]));
+  return{d,root,roman,triad,seventh:root+sq,tNotes:pick([0,2,4]),sNotes:pick([0,2,4,6]),mode:root+' '+sy.modes[d],modeNotes:pick([0,1,2,3,4,5,6]),formula}});
+ return{t,N,degs,iv}
+}
+
+const C=500,W=360/7;
+const P=(r,a)=>{const x=a*Math.PI/180;return[+(C+r*Math.sin(x)).toFixed(2),+(C-r*Math.cos(x)).toFixed(2)]};
+function arc(r0,r1,a0,a1){const[x0,y0]=P(r1,a0),[x1,y1]=P(r1,a1),[x2,y2]=P(r0,a1),[x3,y3]=P(r0,a0);
+ return`M${x0},${y0}A${r1},${r1} 0 0 1 ${x1},${y1}L${x2},${y2}A${r0},${r0} 0 0 0 ${x3},${y3}Z`}
+function ttext(r,a,lines){const n=mod(a,360),flip=n>90&&n<270;let total=0;lines.forEach(l=>total+=l.s*1.2);let off=-total/2,out='';
+ lines.forEach(l=>{const h=l.s*1.2,c=off+h/2;off+=h;const rr=flip?r+c:r-c,[x,y]=P(rr,a),rot=+(flip?n+180:n).toFixed(2);
+  out+=`<text x="${x}" y="${y}" transform="rotate(${rot} ${x} ${y})" font-size="${l.s}" font-weight="${l.w||600}" fill="${l.f}" text-anchor="middle" dominant-baseline="central">${l.t}</text>`});return out}
+
+function render(){
+ const A=analyse(),sy=S.sys;let o='';
+ const RINGS=[[95,150,'var(--n)'],[150,222,'var(--t)'],[222,300,'var(--s)'],[300,402,'var(--m)']];
+ A.degs.forEach((g,i)=>{const a=i*W,a0=a-W/2,a1=a+W/2;
+  RINGS.forEach(([r0,r1,f])=>o+=`<path d="${arc(r0,r1,a0,a1)}" fill="${f}" stroke="var(--bg)" stroke-width="3"/>`);
+  o+=ttext(122,a,[{t:g.root,s:30,w:800,f:'#2a1d10'}]);
+  o+=ttext(186,a,[{t:g.roman,s:15,w:600,f:'#5a2a14'},{t:g.triad,s:22,w:700,f:'#2a1d10'}]);
+  o+=ttext(261,a,[{t:g.seventh,s:24,w:700,f:'#fff'}]);
+  o+=ttext(351,a,[{t:g.mode.replace(g.root+' ',''),s:20,w:700,f:'#fff'},{t:g.modeNotes.join(' · '),s:14,w:600,f:'#f6cf6a'},{t:g.formula,s:12,w:400,f:'#d9c3e2'}])});
+ const sa=S.deg*W;
+ o+=`<path d="${arc(95,402,sa-W/2,sa+W/2)}" fill="rgba(255,255,255,.14)" stroke="var(--hl)" stroke-width="5" stroke-linejoin="round"/>`;
+ for(let k=0;k<12;k++){const a=k*30+S.rot,on=k===S.k,t=on?tonicOf(k,S.sp):tonicOf(k,0);
+  let nm=dn(t);if(SYS[sy].minor)nm=nm.toLowerCase();
+  if(spList(k).length>1&&!on){const t2=spList(k)[1];let n2=dn(t2);if(SYS[sy].minor)n2=n2.toLowerCase();nm+='/'+n2}
+  let rel='';if(sy==='dur')rel=dn(spell(t,MAJ)[5]).toLowerCase();else if(SYS[sy].minor)rel=dn(spell(t,NATMIN)[2]);
+  o+=`<path d="${arc(410,494,a-15,a+15)}" fill="${on?'var(--n)':'var(--ring)'}" stroke="var(--bg)" stroke-width="3"/>`;
+  const[x,y]=P(452,a),big=nm.length>6?20:28;
+  o+=`<text x="${x}" y="${y-(rel?8:0)}" font-size="${big}" font-weight="800" fill="${on?'#2a1d10':'#fff'}" text-anchor="middle" dominant-baseline="central">${nm}</text>`;
+  if(rel)o+=`<text x="${x}" y="${y+18}" font-size="15" font-weight="600" fill="${on?'#5a2a14':'#b9b3c6'}" text-anchor="middle" dominant-baseline="central">${rel}</text>`}
+ o+=`<circle cx="500" cy="500" r="93" fill="var(--bg)"/>`;
+ const kn=keyName(A.t,sy);
+ o+=`<text x="500" y="${SYS[sy].sub?488:500}" font-size="${kn.length>8?32:40}" font-weight="800" fill="var(--ink)" text-anchor="middle" dominant-baseline="central">${kn}</text>`;
+ if(SYS[sy].sub)o+=`<text x="500" y="526" font-size="19" font-weight="600" fill="var(--muted)" text-anchor="middle" dominant-baseline="central">${SYS[sy].sub}</text>`;
+ o+=`<text x="500" y="${SYS[sy].sub?556:540}" font-size="14" fill="var(--muted)" text-anchor="middle" dominant-baseline="central">▶ abspielen</text>`;
+ svg.innerHTML=o;
+ renderInfo(A)
+}
+
+function renderInfo(A){
+ const sy=S.sys,g=A.degs[S.deg],kn=keyName(A.t,sy);let extra='';
+ if(sy==='dur')extra=sig(A.N)+' · Paralleltonart '+dn(A.N[5]).toLowerCase()+'-Moll';
+ else if(sy==='hmoll')extra='Vorzeichen '+sig(spell(A.t,NATMIN))+' · Leitton '+dn(A.N[6]);
+ else if(sy==='mmoll')extra='Vorzeichen '+sig(spell(A.t,NATMIN))+' · '+dn(A.N[5])+' und '+dn(A.N[6])+' erhöht';
+ else extra='Vorzeichen '+sig(spell(A.t,MAJ))+' · 6. Stufe erniedrigt ('+dn(A.N[5])+')';
+ info.innerHTML=`<h2>Stufe ${g.roman} · ${g.triad}</h2><p class="key">${kn}${SYS[sy].sub?' '+SYS[sy].sub:''} · ${extra}</p>
+<dl><dt>Dreiklang</dt><dd>${g.triad}<small>${g.tNotes.join(' – ')}</small></dd>
+<dt>Septakkord</dt><dd>${g.seventh}<small>${g.sNotes.join(' – ')}</small></dd>
+<dt>Modus</dt><dd>${g.mode}<small>${g.modeNotes.join(' · ')}</small></dd>
+<dt>Formel</dt><dd>${g.formula}</dd></dl>
+<div class="play"><button data-play="t">▶ Dreiklang</button><button data-play="s">▶ Septakkord</button><button data-play="m">▶ Modus</button></div>
+<table><thead><tr><th>Stufe</th><th>Dreiklang</th><th>Septakkord</th><th>Modus</th></tr></thead><tbody>
+${A.degs.map(d=>`<tr data-deg="${d.d}" class="${d.d===S.deg?'on':''}"><td>${d.roman}</td><td>${d.triad}</td><td>${d.seventh}</td><td>${SYS[sy].modes[d.d]}</td></tr>`).join('')}
+</tbody></table>`
+}
+
+let ac;
+function play(midis,arp){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();
+ const t=ac.currentTime+.03;midis.forEach((m,i)=>{const st=t+(arp?i*.26:i*.02),o=ac.createOscillator(),g=ac.createGain();
+ o.type='triangle';o.frequency.value=440*2**((m-69)/12);g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.16,st+.02);
+ g.gain.exponentialRampToValueAtTime(.001,st+(arp?.55:1.6));o.connect(g).connect(ac.destination);o.start(st);o.stop(st+1.7)})}catch(e){}}
+function midis(d,ks){const A=analyse(),tp=mod(LS[A.t[0]]+A.t[1],12),base=60+tp-(tp>=7?12:0);
+ return ks.map(k=>base+A.iv[(d+k)%7]+12*Math.floor((d+k)/7))}
+
+let anim=0;
+function animateTo(target){cancelAnimationFrame(anim);const from=S.rot,t0=performance.now(),dur=reduce?1:420;
+ const step=now=>{const p=Math.min(1,(now-t0)/dur),e=1-(1-p)**3;S.rot=from+(target-from)*e;render();if(p<1)anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
+function selectKey(k){S.k=k;S.sp=0;let tg=-k*30;tg+=360*Math.round((S.rot-tg)/360);animateTo(tg)}
+
+const pt=e=>{const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*1000,y:(e.clientY-r.top)/r.height*1000}};
+const ang=p=>Math.atan2(p.x-C,-(p.y-C))*180/Math.PI;
+let drag=null;
+svg.addEventListener('pointerdown',e=>{const p=pt(e),r=Math.hypot(p.x-C,p.y-C),a=ang(p);
+ drag={r,a,last:a,moved:false,ring:r>=405&&r<=500};if(drag.ring){cancelAnimationFrame(anim);try{svg.setPointerCapture(e.pointerId)}catch(_){}}});
+svg.addEventListener('pointermove',e=>{if(!drag||!drag.ring)return;const a=ang(pt(e));const d=mod(a-drag.last+180,360)-180;drag.last=a;
+ S.rot+=d;if(Math.abs(mod(a-drag.a+180,360)-180)>3)drag.moved=true;if(drag.moved)render()});
+function end(e,cancel){if(!drag)return;const g=drag;drag=null;
+ if(g.ring){if(g.moved||cancel){const k=mod(Math.round(-S.rot/30),12);if(k===S.k){animateTo(-k*30+360*Math.round((S.rot+k*30)/360))}else selectKey(k)}
+  else{const k=mod(Math.round((g.a-S.rot)/30),12);if(k===S.k){const n=spList(k).length;if(n>1){S.sp=(S.sp+1)%n;render()}}else selectKey(k)}}
+ else if(!cancel){if(g.r<95){play(midis(0,[0,1,2,3,4,5,6,7]),true)}else if(g.r<=402){S.deg=mod(Math.round(g.a/W),7);render()}}}
+svg.addEventListener('pointerup',e=>end(e,false));
+svg.addEventListener('pointercancel',e=>end(e,true));
+
+document.querySelectorAll('[data-sys]').forEach(b=>b.addEventListener('click',()=>{S.sys=b.dataset.sys;S.sp=0;
+ document.querySelectorAll('[data-sys]').forEach(x=>x.setAttribute('aria-pressed',x===b));render()}));
+info.addEventListener('click',e=>{const pb=e.target.closest('[data-play]');
+ if(pb){const k=pb.dataset.play;play(midis(S.deg,k==='t'?[0,2,4]:k==='s'?[0,2,4,6]:[0,1,2,3,4,5,6,7]),k==='m');return}
+ const tr=e.target.closest('tr[data-deg]');if(tr){S.deg=+tr.dataset.deg;render()}});
+render();
+}
+</script>
+</body>
+</html>
