@@ -7,6 +7,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>try{const t=localStorage.getItem('qz-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
@@ -24,6 +25,8 @@
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Manrope,system-ui,sans-serif;overflow-x:clip}
 .band{padding:clamp(20px,4vw,48px) max(5vw,16px);max-width:1240px;margin:0 auto}
 h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0 0 6px;font-weight:800;text-wrap:balance}
+.head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.theme{flex:none;width:44px;height:44px;border-radius:22px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font-size:20px;cursor:pointer;line-height:1}
 .lead{color:var(--muted);margin:0 0 18px;max-width:62ch}
 .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .tabs button{font:600 15px Manrope,sans-serif;min-height:44px;padding:0 16px;border-radius:22px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
@@ -54,7 +57,7 @@ tbody tr{cursor:pointer}tbody tr.on{background:color-mix(in srgb,var(--t) 22%,tr
 </head>
 <body>
 <main class="band">
-<h1>Quintenzirkel & Stufen</h1>
+<div class="head"><h1>Quintenzirkel & Stufen</h1><button id="theme" class="theme" type="button" aria-label="Hell/Dunkel umschalten"></button></div>
 <p class="lead">Außen die Tonarten im Quintenzirkel, innen die Stufen der gewählten Tonart: Töne, Dreiklänge, Septakkorde und Modi.</p>
 <div class="tabs" role="group" aria-label="Tonleitersystem">
 <button data-sys="dur" aria-pressed="true">Dur</button>
@@ -199,6 +202,11 @@ document.querySelectorAll('[data-sys]').forEach(b=>b.addEventListener('click',()
 info.addEventListener('click',e=>{const pb=e.target.closest('[data-play]');
  if(pb){const k=pb.dataset.play;play(midis(S.deg,k==='t'?[0,2,4]:k==='s'?[0,2,4,6]:[0,1,2,3,4,5,6,7]),k==='m');return}
  const tr=e.target.closest('tr[data-deg]');if(tr){S.deg=+tr.dataset.deg;render()}});
+const tb=document.getElementById('theme'),root=document.documentElement,mq=matchMedia('(prefers-color-scheme: dark)');
+const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':mq.matches;
+const setIcon=()=>{const d=isDark();tb.textContent=d?'☀':'☾';tb.title=d?'Heller Modus':'Dunkler Modus'};
+tb.addEventListener('click',()=>{const t=isDark()?'light':'dark';root.dataset.theme=t;try{localStorage.setItem('qz-theme',t)}catch(e){}setIcon()});
+mq.addEventListener('change',setIcon);setIcon();
 render();
 }
 </script>
